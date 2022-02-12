@@ -19,9 +19,9 @@ struct XMLELEMENT
          
 
 };
-XMLELEMENT* xmlParser(string xmlstr,int i );
+XMLELEMENT* xmlParser(string xmlstr,int& i );
 
-void xmlAttributersParser(XMLELEMENT* xmlobject,string xmlstr,int i);
+void xmlAttributersParser(XMLELEMENT* xmlobject,string xmlstr,int& i);
 int main(){
 
 
@@ -29,10 +29,11 @@ cout<<"test from xml parser\n";
 
 
     string type="<xmlExample fAtt=\"dfv\" secAtt=\"vcvvc\">dfdf</xmlExample>";
-xmlParser(type, 0 );
+    int starter=0;
+auto xmlElement=xmlParser(type, starter );
     return 0;
 }
-XMLELEMENT* xmlParser(string xmlstr,int i ){
+XMLELEMENT* xmlParser(string xmlstr,int& i ){
 
     while (i<xmlstr.length())
     {
@@ -69,10 +70,49 @@ XMLELEMENT* xmlParser(string xmlstr,int i ){
         {
             xmlAttributersParser(element,xmlstr,i);
             //if true this means the tag has no sons
-            if (xmlstr[i]=='/')
+            
+            
+            if (xmlstr[i]=='>')
+            {
+                if (xmlstr[i-1]=='/')
             {
                 element->hasSons=false;
+            }else{
+                element->hasSons=true;
+              
             }
+            ++i;
+
+ while (xmlstr[i]!='<')
+               {
+                   element->innerValue+=xmlstr[i];
+                   ++i;
+               }
+               //getting near to check if its the closing tag
+            ++i;
+            ++i;
+            int j=0;
+            string toCompare="";
+                while (j<element->tag.length())
+                {
+                    toCompare+=xmlstr[i];
+                    ++j;
+                    ++i;
+                }
+
+                if (toCompare==element->tag)
+                {
+                element->hasSons=false;    
+                }
+                --i;
+                --i;
+                i-=element->tag.length();
+                
+                
+
+            }
+            
+           
             
             break;
         }
@@ -91,7 +131,7 @@ xmlAttributersParser(element,xmlstr,i);
 
 
 }
-void  xmlAttributersParser(XMLELEMENT* xmlobject,string xmlstr,int i)
+void  xmlAttributersParser(XMLELEMENT* xmlobject,string xmlstr,int& i)
 
 
 {
@@ -184,6 +224,8 @@ string AttributeValue="";
         ++i;
       
     }
+
+
 
     cout<<'\n'<<xmlstr[i];
 
